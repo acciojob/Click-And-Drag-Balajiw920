@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Click and Drag</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <div class="items">
@@ -35,50 +35,35 @@
   </div>
 
 <script>
-  const items = document.querySelectorAll('.item');
+  const items = document.querySelector('.items');
+let isDown = false;
+let startX, scrollLeft;
 
-  let activeItem = null;
-  let startPos = 0;
-  let currentPos = 0;
+items.addEventListener('mousedown', (e) => {
+  isDown = true;
+  items.classList.add('active');
+  startX = e.pageX - items.offsetLeft;
+  scrollLeft = items.scrollLeft;
+});
 
-  function dragStart() {
-    activeItem = this;
-    startPos = currentPos || this.offsetTop;
-  }
+items.addEventListener('mouseleave', () => {
+  isDown = false;
+  items.classList.remove('active');
+});
 
-  function dragEnd() {
-    activeItem = null;
-  }
+items.addEventListener('mouseup', () => {
+  isDown = false;
+  items.classList.remove('active');
+});
 
-  function dragOver(e) {
-    e.preventDefault();
-    currentPos = e.pageY - startPos;
-    const currentElementIndex = Array.from(items).indexOf(activeItem);
-    const nextElement = items[currentElementIndex + 1];
-    const previousElement = items[currentElementIndex - 1];
-    if (nextElement && currentPos > nextElement.offsetTop - activeItem.offsetHeight / 2) {
-      items[currentElementIndex] = nextElement;
-      items[currentElementIndex + 1] = activeItem;
-      updateItemOrder();
-    } else if (previousElement && currentPos < previousElement.offsetTop + previousElement.offsetHeight - activeItem.offsetHeight / 2) {
-      items[currentElementIndex] = previousElement;
-      items[currentElementIndex - 1] = activeItem;
-      updateItemOrder();
-    }
-  }
+items.addEventListener('mousemove', (e) => {
+  if (!isDown) return;
+  e.preventDefault();
+  const x = e.pageX - items.offsetLeft;
+  const walk = (x - startX) * 3; // adjust scroll speed
+  items.scrollLeft = scrollLeft - walk;
+});
 
-  function updateItemOrder() {
-    const itemsContainer = document.querySelector('.items');
-    itemsContainer.innerHTML = '';
-    items.forEach(item => itemsContainer.appendChild(item));
-  }
-
-  items.forEach(item => {
-    item.addEventListener('dragstart', dragStart);
-    item.addEventListener('dragend', dragEnd);
-  });
-
-  document.addEventListener('dragover', dragOver);
 </script>
 
 </body>
