@@ -36,6 +36,52 @@
 
 <script>
 //Your code goes here 
+  
+  const items = document.querySelectorAll('.item');
+
+let activeItem = null;
+let startPos = 0;
+let currentPos = 0;
+
+function dragStart() {
+  activeItem = this;
+  startPos = currentPos || this.offsetTop;
+}
+
+function dragEnd() {
+  activeItem = null;
+}
+
+function dragOver(e) {
+  e.preventDefault();
+  currentPos = e.pageY - startPos;
+  const currentElementIndex = Array.from(items).indexOf(activeItem);
+  const nextElement = items[currentElementIndex + 1];
+  const previousElement = items[currentElementIndex - 1];
+  if (nextElement && currentPos > nextElement.offsetTop - activeItem.offsetHeight / 2) {
+    items[currentElementIndex] = nextElement;
+    items[currentElementIndex + 1] = activeItem;
+    updateItemOrder();
+  } else if (previousElement && currentPos < previousElement.offsetTop + previousElement.offsetHeight - activeItem.offsetHeight / 2) {
+    items[currentElementIndex] = previousElement;
+    items[currentElementIndex - 1] = activeItem;
+    updateItemOrder();
+  }
+}
+
+function updateItemOrder() {
+  const itemsContainer = document.querySelector('.items');
+  itemsContainer.innerHTML = '';
+  items.forEach(item => itemsContainer.appendChild(item));
+}
+
+items.forEach(item => {
+  item.addEventListener('dragstart', dragStart);
+  item.addEventListener('dragend', dragEnd);
+});
+
+document.addEventListener('dragover', dragOver);
+
 </script>
 
   </body>
